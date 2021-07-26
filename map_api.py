@@ -1,14 +1,15 @@
 import json
 import folium
+import flask
 from flask import Flask
 from flask_restful import Resource, Api
 import pandas as pd
-import app
 from flask import render_template
 import http.server
 import socketserver
 app = Flask(__name__)
 api = Api(app)
+
 def get_ids_locations(list_of_dicts):
     ids=[]
     locations=[]
@@ -53,22 +54,17 @@ class ids(Resource):
 
     pass
 
+@app.route('/map')
+def show_map():
+    return flask.send_file('london.html')
+
 class Locations(Resource):
     def get(self):
         return vehicle_coordinates, 200
     pass
     
-class Map(Resource):
-    def get(self):
-        PORT=8080
-        Handler=http.server.SimpleHTTPRequestHandler
-        with socketserver.TCPServer(("london.html", PORT), Handler) as httpd:
-            print ("serving at port", PORT)
-            httpd.serve_forever()
-    pass
 api.add_resource(ids, '/ids')
 api.add_resource(Locations, '/locations') 
-api.add_resource(Map, '/map') 
 
 
 if __name__ == '__main__':
